@@ -18,9 +18,11 @@ function hf = plot_sp(sp, varargin)
 %           'XLabel' - If provided, will override the existing x label.
 %                      Only effective when the plot type is set to
 %                      'cartesian' or 'cartesian3D'.
-%           'YLabel' - If provided, will override the existing x label.
+%           'YLabel' - If provided, will override the existing y label.
 %                      Only effective when the plot type is set to
 %                      'cartesian' or 'cartesian3D'.
+%           'LineWidth' - Set the line width for the spectrum plot. Default
+%                         is 0.5.
 %Output:
 %   hf - Figure handle.
 options = opt2struct(varargin);
@@ -79,17 +81,21 @@ function [hsp, htp] = plot_1d_impl(sp, options)
     else
         y_range = [0 1];
     end
+    % set default linewidth
+    if ~isfield(options, 'linewidth')
+        options.linewidth = 0.5;
+    end
     % plot
     switch lower(options.plottype)
         case 'cartesian'
             if isfield(sp, 'true_positions')
-                htp = stem(sp.true_positions, ones(size(sp.true_positions)) * y_range(2), '--r');
+                htp = stem(sp.true_positions, ones(size(sp.true_positions)) * y_range(2), '--r', 'LineWidth', options.linewidth);
                 hold on;
             end
             if sp.discrete
-                hsp = stem(sp.x, sp.y, 'Marker', 'none');
+                hsp = stem(sp.x, sp.y, 'Marker', 'none', 'LineWidth', options.linewidth);
             else
-                hsp = plot(sp.x, sp.y);
+                hsp = plot(sp.x, sp.y, 'LineWidth', options.linewidth);
             end
             hold off;
             if isfield(options, 'xlabel')
@@ -106,12 +112,12 @@ function [hsp, htp] = plot_1d_impl(sp, options)
         case 'polar'
             % draw the unit circle
             theta = linspace(0, pi*2, 360);
-            plot3(cos(theta), sin(theta), ones(1,360) * y_range(1), '-k');
+            plot3(cos(theta), sin(theta), ones(1,360) * y_range(1), '-k', 'LineWidth', options.linewidth);
             hold on;
-            line([0 0], [-1 1], [0 0], 'LineStyle', '--', 'Color', 'black'); hold on;
-            line([0 1], [0 0], [0 0], 'LineStyle', '--', 'Color', 'black'); hold on;
-            line([0 sqrt(2)/2], [0 sqrt(2)/2], [0 0], 'LineStyle', '--', 'Color', 'black'); hold on;
-            line([0 sqrt(2)/2], [0 -sqrt(2)/2], [0 0], 'LineStyle', '--', 'Color', 'black'); hold on;
+            line([0 0], [-1 1], [0 0], 'LineStyle', '--', 'Color', 'black', 'LineWidth', options.linewidth); 
+            line([0 1], [0 0], [0 0], 'LineStyle', '--', 'Color', 'black', 'LineWidth', options.linewidth); 
+            line([0 sqrt(2)/2], [0 sqrt(2)/2], [0 0], 'LineStyle', '--', 'Color', 'black', 'LineWidth', options.linewidth); 
+            line([0 sqrt(2)/2], [0 -sqrt(2)/2], [0 0], 'LineStyle', '--', 'Color', 'black', 'LineWidth', options.linewidth); 
             switch lower(sp.x_unit)
                 case 'radian'
                     text(0, -1.1, 0, '-\pi/2');
@@ -128,14 +134,14 @@ function [hsp, htp] = plot_1d_impl(sp, options)
             end
             if isfield(sp, 'true_positions')
                 theta = sp.true_positions / x_range(2) * pi/2;
-                htp = stem3(cos(theta), sin(theta), ones(size(sp.true_positions)) * y_range(2), '--r');
+                htp = stem3(cos(theta), sin(theta), ones(size(sp.true_positions)) * y_range(2), '--r', 'LineWidth', options.linewidth);
                 hold on;
             end
             theta = sp.x / x_range(2) * pi/2;
             if sp.discrete
-                hsp = stem3(cos(theta), sin(theta), sp.y, 'x');
+                hsp = stem3(cos(theta), sin(theta), sp.y, 'x', 'LineWidth', options.linewidth);
             else
-                hsp = plot3(cos(theta), sin(theta), sp.y);
+                hsp = plot3(cos(theta), sin(theta), sp.y, 'LineWidth', options.linewidth);
             end
             hold off;
             axis('equal');
